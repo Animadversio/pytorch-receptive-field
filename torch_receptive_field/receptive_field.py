@@ -43,7 +43,7 @@ def receptive_field(model, input_size, batch_size=-1, device="cuda"):
                 p_r = receptive_field[p_key]["r"]
                 p_start = receptive_field[p_key]["start"]
                 
-                if class_name == "Conv2d" or class_name == "MaxPool2d":
+                if class_name == "Conv2d" or class_name == "MaxPool2d" or class_name == "MaxPool2d":
                     kernel_size = module.kernel_size
                     stride = module.stride
                     padding = module.padding
