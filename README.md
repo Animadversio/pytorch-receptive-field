@@ -1,5 +1,9 @@
 # pytorch-receptive-field
+ 
+[![Build Status](https://travis-ci.com/Fangyh09/pytorch-receptive-field.svg?branch=master)](https://travis-ci.com/Fangyh09/pytorch-receptive-field)
+
 Compute CNN receptive field size in pytorch
+
 
 ## Usage
 `git clone https://github.com/Fangyh09/pytorch-receptive-field.git`
@@ -7,6 +11,13 @@ Compute CNN receptive field size in pytorch
 ```python
 from torch_receptive_field import receptive_field
 receptive_field(model, input_size=(channels, H, W))
+```
+
+Or
+```python
+from torch_receptive_field import receptive_field
+dict = receptive_field(model, input_size=(channels, H, W))
+receptive_field_for_unit(receptive_field_dict, "2", (2,2))
 ```
 
 ## Example
@@ -35,7 +46,8 @@ class Net(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # PyTorch v0.4.0
 model = Net().to(device)
 
-receptive_field(model, (3, 256, 256))
+receptive_field_dict = receptive_field(model, (3, 256, 256))
+receptive_field_for_unit(receptive_field_dict, "2", (2,2))
 ```
 ```
 ------------------------------------------------------------------------------
@@ -47,6 +59,8 @@ receptive_field(model, (3, 256, 256))
         3             [128, 128]        0.5        2.0             7.0
         4               [64, 64]        0.5        4.0            11.0
 ==============================================================================
+Receptive field size for layer 2, unit_position (1, 1),  is
+ [(0, 6.0), (0, 6.0)]
 ```
 
 ## More
@@ -56,7 +70,13 @@ receptive_field(model, (3, 256, 256))
 
 `receptive_field` is the field size of the item in the map grid.
 
+
+## Todo
+- [x] Add Travis CI 
+  
+
 ## Related
 Thanks @pytorch-summary
 
 https://medium.com/mlreview/a-guide-to-receptive-field-arithmetic-for-convolutional-neural-networks-e0f514068807
+

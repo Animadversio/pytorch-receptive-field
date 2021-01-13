@@ -50,7 +50,7 @@ def receptive_field(model, input_size, batch_size=-1, device="cuda"):
                     kernel_size, stride, padding = map(check_same, [kernel_size, stride, padding])
                     receptive_field[m_key]["j"] = p_j * stride
                     receptive_field[m_key]["r"] = p_r + (kernel_size - 1) * p_j
-                    receptive_field[m_key]["start"] = p_start + (int((kernel_size - 1) / 2) - padding) * p_j
+                    receptive_field[m_key]["start"] = p_start + ((kernel_size - 1) / 2 - padding) * p_j
                 elif class_name == "BatchNorm2d" or class_name == "ReLU" or class_name == "Bottleneck":
                     receptive_field[m_key]["j"] = p_j
                     receptive_field[m_key]["r"] = p_r
@@ -142,10 +142,12 @@ def receptive_field(model, input_size, batch_size=-1, device="cuda"):
         print(line_new)
 
     print("==============================================================================")
+    # add input_shape
+    receptive_field["input_size"] = input_size
     return receptive_field
 
 
-def receptive_field_for_unit(receptive_field_dict, input_shape, layer, unit_position):
+def receptive_field_for_unit(receptive_field_dict, layer, unit_position):
     """Utility function to calculate the receptive field for a specific unit in a layer
         using the dictionary calculated above
     :parameter
@@ -156,10 +158,11 @@ def receptive_field_for_unit(receptive_field_dict, input_shape, layer, unit_posi
     alexnet = models.alexnet()
     model = alexnet.features.to('cuda')
     receptive_field_dict = receptive_field(model, (3, 224, 224))
-    receptive_field_for_unit(receptive_field_dict, (3, 224, 224), "8", (6,6))
+    receptive_field_for_unit(receptive_field_dict, "8", (6,6))
     ```
     Out: [(62.0, 161.0), (62.0, 161.0)]
     """
+    input_shape = receptive_field_dict["input_size"]
     if layer in receptive_field_dict:
         rf_stats = receptive_field_dict[layer]
         assert len(unit_position) == 2
@@ -176,6 +179,7 @@ def receptive_field_for_unit(receptive_field_dict, input_shape, layer, unit_posi
         else:  # input shape is (channel, H, W)
             limit = input_shape[1:3]
         rf_range = [(max(0, rf_range[axis][0]), min(limit[axis], rf_range[axis][1])) for axis in range(2)]
+        print("Receptive field size for layer %s, unit_position %s,  is \n %s" % (layer, unit_position, rf_range))
         return rf_range
     else:
         raise KeyError("Layer name incorrect, or not included in the model.")
